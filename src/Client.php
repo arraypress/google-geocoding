@@ -182,7 +182,7 @@ class Client {
 	 * @return string Cache key
 	 */
 	private function get_cache_key( string $identifier ): string {
-		return 'geocoding_' . md5( $identifier . $this->api_key );
+		return 'google_geocoding_' . md5( $identifier . $this->api_key );
 	}
 
 	/**
@@ -198,7 +198,7 @@ class Client {
 		}
 
 		global $wpdb;
-		$pattern = $wpdb->esc_like( '_transient_geocoding_' ) . '%';
+		$pattern = $wpdb->esc_like( '_transient_google_geocoding_' ) . '%';
 
 		return $wpdb->query(
 				$wpdb->prepare(

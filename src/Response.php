@@ -130,9 +130,7 @@ class Response {
 	 * @return array|null Array containing compound_code and global_code
 	 */
 	public function get_plus_code(): ?array {
-		$result = $this->get_first_result();
-
-		return $result['plus_code'] ?? null;
+		return $this->data['plus_code'] ?? $this->get_first_result()['plus_code'] ?? null;
 	}
 
 	/**
@@ -191,6 +189,19 @@ class Response {
 	}
 
 	/**
+	 * Get address components by multiple types
+	 *
+	 * @param array $types Array of types to match
+	 *
+	 * @return array Array of matching address components
+	 */
+	public function get_address_components_by_types( array $types ): array {
+		return array_filter( $this->get_address_components(), function ( $component ) use ( $types ) {
+			return count( array_intersect( $types, $component['types'] ) ) === count( $types );
+		} );
+	}
+
+	/**
 	 * Get specific address component
 	 *
 	 * @param string $type The type of address component to retrieve
@@ -242,6 +253,33 @@ class Response {
 	 */
 	public function get_street_name(): ?string {
 		return $this->get_address_component( 'route' );
+	}
+
+	/**
+	 * Get neighborhood
+	 *
+	 * @return string|null
+	 */
+	public function get_neighborhood(): ?string {
+		return $this->get_address_component( 'neighborhood' );
+	}
+
+	/**
+	 * Get sublocality
+	 *
+	 * @return string|null
+	 */
+	public function get_sublocality(): ?string {
+		return $this->get_address_component( 'sublocality' );
+	}
+
+	/**
+	 * Get sublocality level 1
+	 *
+	 * @return string|null
+	 */
+	public function get_sublocality_level_1(): ?string {
+		return $this->get_address_component( 'sublocality_level_1' );
 	}
 
 	/**
@@ -319,7 +357,7 @@ class Response {
 	}
 
 	/**
-	 * Get complete formatted address components
+	 * Get complete structured address components
 	 *
 	 * @return array Structured address components
 	 */
@@ -327,6 +365,8 @@ class Response {
 		return [
 			'street_number'     => $this->get_street_number(),
 			'street_name'       => $this->get_street_name(),
+			'neighborhood'      => $this->get_neighborhood(),
+			'sublocality'       => $this->get_sublocality(),
 			'city'              => $this->get_city(),
 			'county'            => $this->get_county(),
 			'state'             => $this->get_state(),
@@ -345,6 +385,40 @@ class Response {
 	 */
 	public function get_status(): string {
 		return $this->data['status'] ?? '';
+	}
+
+	/**
+	 * Check if the location is a business or point of interest
+	 *
+	 * @return bool
+	 */
+	public function is_business_location(): bool {
+		$types = $this->get_types();
+
+		return in_array( 'establishment', $types ) ||
+		       in_array( 'point_of_interest', $types );
+	}
+
+	/**
+	 * Check if the first result is a partial match
+	 *
+	 * @return bool
+	 */
+	public function is_partial_match(): bool {
+		$result = $this->get_first_result();
+
+		return isset( $result['partial_match'] ) && $result['partial_match'];
+	}
+
+	/**
+	 * Iterate over all results and apply a callback
+	 *
+	 * @param callable $callback Callback function to apply to each result
+	 *
+	 * @return array Results after applying the callback
+	 */
+	public function iterate_results( callable $callback ): array {
+		return array_map( $callback, $this->get_results() );
 	}
 
 }

@@ -33,20 +33,20 @@ composer require arraypress/google-geocoding
 use ArrayPress\Google\Geocoding\Client;
 
 // Initialize client with your API key
-$client = new Client('your-google-api-key');
+$client = new Client( 'your-google-api-key' );
 
 // Forward geocoding (Address to Coordinates)
-$result = $client->geocode('1600 Amphitheatre Parkway, Mountain View, CA');
-if (!is_wp_error($result)) {
-$coordinates = $result->get_coordinates();
-echo "Latitude: {$coordinates['latitude']}\n";
-echo "Longitude: {$coordinates['longitude']}\n";
+$result = $client->geocode( '1600 Amphitheatre Parkway, Mountain View, CA' );
+if ( ! is_wp_error( $result ) ) {
+	$coordinates = $result->get_coordinates();
+	echo "Latitude: {$coordinates['latitude']}\n";
+	echo "Longitude: {$coordinates['longitude']}\n";
 }
 
 // Reverse geocoding (Coordinates to Address)
-$result = $client->reverse_geocode(37.4220, -122.0841);
-if (!is_wp_error($result)) {
-echo $result->get_formatted_address();
+$result = $client->reverse_geocode( 37.4220, - 122.0841 );
+if ( ! is_wp_error( $result ) ) {
+	echo $result->get_formatted_address();
 }
 ```
 
@@ -54,16 +54,16 @@ echo $result->get_formatted_address();
 ### Getting Structured Address Components
 
 ```php
-$result = $client->geocode('1600 Amphitheatre Parkway, Mountain View, CA');
-if (!is_wp_error($result)) {
-$address = $result->get_structured_address();
-$street = $result->get_street_number() . ' ' . $result->get_street_name();
-$city = $result->get_city();
-$state = $result->get_state();
-$state_code = $result->get_state_short();  // Returns "CA"
-$postal = $result->get_postal_code();
-$country = $result->get_country();
-$country_code = $result->get_country_short(); // Returns "US"
+$result = $client->geocode( '1600 Amphitheatre Parkway, Mountain View, CA' );
+if ( ! is_wp_error( $result ) ) {
+	$address      = $result->get_structured_address();
+	$street       = $result->get_street_number() . ' ' . $result->get_street_name();
+	$city         = $result->get_city();
+	$state        = $result->get_state();
+	$state_code   = $result->get_state_short();  // Returns "CA"
+	$postal       = $result->get_postal_code();
+	$country      = $result->get_country();
+	$country_code = $result->get_country_short(); // Returns "US"
 }
 ```
 
@@ -71,13 +71,13 @@ $country_code = $result->get_country_short(); // Returns "US"
 
 ```php
 // Initialize with custom cache duration (1 hour = 3600 seconds)
-$client = new Client('your-api-key', true, 3600);
+$client = new Client( 'your-api-key', true, 3600 );
 
 // Results will be cached
-$result = $client->geocode('1600 Amphitheatre Parkway, Mountain View, CA');
+$result = $client->geocode( '1600 Amphitheatre Parkway, Mountain View, CA' );
 
 // Clear specific cache
-$client->clear_cache('geocode_1600 Amphitheatre Parkway, Mountain View, CA');
+$client->clear_cache( 'geocode_1600 Amphitheatre Parkway, Mountain View, CA' );
 
 // Clear all geocoding caches
 $client->clear_cache();
@@ -90,7 +90,7 @@ $client->clear_cache();
 * `reverse_geocode( $lat, $lng )`: Convert coordinates to address
 * `clear_cache( $identifier = null )`: Clear cached responses
 
-Response Methods
+### Response Methods
 
 * `get_formatted_address()`: Get full formatted address
 * `get_coordinates()`: Get latitude/longitude array
@@ -113,7 +113,7 @@ Response Methods
 * `get_viewport()`: Get viewport bounds
 * `get_structured_address()`: Get all components
 
-Use Cases
+## Use Cases
 
 * **Address Validation**: Verify and standardize addresses
 * **Coordinate Lookup**: Get coordinates for addresses
@@ -130,3 +130,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the GPL-2.0-or-later License.
+
+## Support
+
+- [Documentation](https://github.com/arraypress/google-geocoding)
+- [Issue Tracker](https://github.com/arraypress/google-geocoding/issues)
