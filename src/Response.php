@@ -256,6 +256,22 @@ class Response {
 	}
 
 	/**
+	 * Get combined street address (number and name)
+	 *
+	 * @return string|null
+	 */
+	public function get_street(): ?string {
+		$number = $this->get_street_number();
+		$name   = $this->get_street_name();
+
+		if ( empty( $number ) && empty( $name ) ) {
+			return null;
+		}
+
+		return trim( $number . ' ' . $name );
+	}
+
+	/**
 	 * Get neighborhood
 	 *
 	 * @return string|null
