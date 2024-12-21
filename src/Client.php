@@ -13,6 +13,7 @@ declare( strict_types=1 );
 
 namespace ArrayPress\Google\Geocoding;
 
+use ArrayPress\Google\Geocoding\Traits\Parameters;
 use WP_Error;
 
 /**
