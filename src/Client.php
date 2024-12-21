@@ -21,13 +21,7 @@ use WP_Error;
  * A comprehensive utility class for interacting with the Google Geocoding API.
  */
 class Client {
-
-	/**
-	 * API key for Google Geocoding
-	 *
-	 * @var string
-	 */
-	private string $api_key;
+	use Parameters;
 
 	/**
 	 * Base URL for the Geocoding API
@@ -37,20 +31,6 @@ class Client {
 	private const API_ENDPOINT = 'https://maps.googleapis.com/maps/api/geocode/json';
 
 	/**
-	 * Whether to enable response caching
-	 *
-	 * @var bool
-	 */
-	private bool $enable_cache;
-
-	/**
-	 * Cache expiration time in seconds
-	 *
-	 * @var int
-	 */
-	private int $cache_expiration;
-
-	/**
 	 * Initialize the Geocoding client
 	 *
 	 * @param string $api_key          API key for Google Geocoding
@@ -58,9 +38,9 @@ class Client {
 	 * @param int    $cache_expiration Cache expiration in seconds (default: 24 hours)
 	 */
 	public function __construct( string $api_key, bool $enable_cache = true, int $cache_expiration = 86400 ) {
-		$this->api_key          = $api_key;
-		$this->enable_cache     = $enable_cache;
-		$this->cache_expiration = $cache_expiration;
+		$this->set_api_key( $api_key );
+		$this->set_cache_enabled( $enable_cache );
+		$this->set_cache_expiration( $cache_expiration );
 	}
 
 	/**
@@ -73,7 +53,7 @@ class Client {
 	public function geocode( string $address ) {
 		$cache_key = $this->get_cache_key( 'geocode_' . $address );
 
-		if ( $this->enable_cache ) {
+		if ( $this->is_cache_enabled() ) {
 			$cached_data = get_transient( $cache_key );
 			if ( false !== $cached_data ) {
 				return new Response( $cached_data );
@@ -86,8 +66,8 @@ class Client {
 			return $response;
 		}
 
-		if ( $this->enable_cache ) {
-			set_transient( $cache_key, $response, $this->cache_expiration );
+		if ( $this->is_cache_enabled() ) {
+			set_transient( $cache_key, $response, $this->get_cache_expiration() );
 		}
 
 		return new Response( $response );
@@ -104,7 +84,7 @@ class Client {
 	public function reverse_geocode( float $lat, float $lng ) {
 		$cache_key = $this->get_cache_key( "reverse_{$lat}_{$lng}" );
 
-		if ( $this->enable_cache ) {
+		if ( $this->is_cache_enabled() ) {
 			$cached_data = get_transient( $cache_key );
 			if ( false !== $cached_data ) {
 				return new Response( $cached_data );
@@ -117,8 +97,8 @@ class Client {
 			return $response;
 		}
 
-		if ( $this->enable_cache ) {
-			set_transient( $cache_key, $response, $this->cache_expiration );
+		if ( $this->is_cache_enabled() ) {
+			set_transient( $cache_key, $response, $this->get_cache_expiration() );
 		}
 
 		return new Response( $response );
@@ -132,7 +112,7 @@ class Client {
 	 * @return array|WP_Error Response array or WP_Error on failure
 	 */
 	private function make_request( array $params ) {
-		$params['key'] = $this->api_key;
+		$params['key'] = $this->get_api_key();
 
 		$url = add_query_arg( $params, self::API_ENDPOINT );
 
@@ -182,7 +162,7 @@ class Client {
 	 * @return string Cache key
 	 */
 	private function get_cache_key( string $identifier ): string {
-		return 'google_geocoding_' . md5( $identifier . $this->api_key );
+		return 'google_geocoding_' . md5( $identifier . $this->get_api_key() );
 	}
 
 	/**
